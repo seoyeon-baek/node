@@ -2,6 +2,7 @@ const http = require('http')
 const fs = require('fs')
 const url = require('url')
 const qs = require('querystring');
+const sanitizeHTML = require('sanitize-html');
 
 const template = {
     List: function (filelist){
@@ -60,15 +61,19 @@ const app = http.createServer(function (request, response) {
                 fs.readFile(`data/${queryData.id}`, 'utf8', function (err, description) {
                     const title = queryData.id
                     const list = template.List(data);
+                    const sanitizeTitle = sanitizeHTML(title);
+                    const sanitizeDescription = sanitizeHTML(description);
+
+
                     //메인 화면에서는 create(새 게시글 작성)만 가능하게
-                    const html = template.HTML(title, list, description,
-                        `<a href="create">create</a> <a href="/update?id=${title}">update</a>
+                    const html = template.HTML(title, list, sanitizeDescription,
+                        `<a href="create">create</a> <a href="/update?id=${sanitizeTitle}">update</a>
                     <form action="delete_process" method="post">
-                        <input type="hidden" name="id" value="${title}">
+                        <input type="hidden" name="id" value="${sanitizeTitle}">
                         <input type="submit" value="delete">
                     </form>`);
                     response.writeHead(200)
-                    response.end(template)
+                    response.end(html)
                 })
             });
         }
@@ -85,7 +90,7 @@ const app = http.createServer(function (request, response) {
                     <p><input type="submit"/></p>
                 </form>`, '') //글생성 중에는 create,update가 안나오게
             response.writeHead(200);
-            response.end(template);
+            response.end(html);
         })
     }else if (pathname === '/create_process') {
         let body = '';
