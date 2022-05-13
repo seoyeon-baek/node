@@ -3,37 +3,7 @@ const fs = require('fs')
 const url = require('url')
 const qs = require('querystring');
 const sanitizeHTML = require('sanitize-html');
-
-const template = {
-    List: function (filelist){
-        let list = '<ul>';
-        for(let i=0; i<filelist.length; i++) {
-            list += `<li> <a href="/?id=${filelist[i]}"> ${filelist[i]} </a> </li>`;
-        }
-        list += '</ul>';
-        return list;
-    },
-    HTML: function(title, list, body, control){
-        return `
-          <!doctype html>
-          <html lang="ko">
-          <head>
-            <title>WEB1 - ${title}</title>
-            <meta charset="utf-8">
-          </head>
-          <body>
-            <h1><a href="/">WEB</a></h1>
-            ${list}
-            <h2>${title}</h2>
-            ${control}
-            <p>${body}</p>
-          </body>
-          </html>
-          `
-    }
-}
-
-
+const template = require('./lib/template');
 
 const app = http.createServer(function (request, response) {
     const _url = request.url
@@ -139,7 +109,7 @@ const app = http.createServer(function (request, response) {
                                 <p><input type="submit"/></p>
                             </form>`, `<a href="create">create</a> <a href="/update?id=${title}">update</a>`) //글생성 중에는 create,update가 안나오게
                 response.writeHead(200);
-                response.end(template);
+                response.end(html);
             })
         });
     }else if(pathname === '/delete_process'){
