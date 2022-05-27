@@ -15,7 +15,21 @@ app.get('/', function (req,res){
 });
 
 app.get('/page/:pageId', function (req,res){
-    res.send("req.params");
+    fs.readdir("/data", function(errm, filelist){
+        const list = template.list(filelist);
+        const id = req.params.pageId;
+        fs.readFile(`./data/${id}`, 'utf8', function (err, description){
+            const title = id;
+            const html = template.HTML(title, list, description,
+                `<a href="/create">create</a>
+                        <a href="/update?id=${title}">update</a>
+                        <form action="delete_process" method="post">
+                            <input type="hidden" name="id" value="${title}"/>
+                            <input type="submit" value="delete"/>
+                        </form>`);
+                        res.send(html);
+        });
+    });
 });
 
-app.listen(3333);
+app.listen(4444);
